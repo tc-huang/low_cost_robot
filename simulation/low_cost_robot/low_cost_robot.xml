@@ -75,8 +75,8 @@
 
                             </body>
                             <!-- End effector frame in the middle of the two grippers -->
-                            <body>
-                                <geom type="sphere" name="end_effector" size="0.001" pos="-0.005 0.1935 0.1635" contype="0" conaffinity="0" rgba="0 0 0 0"/>
+                            <body name="end_effector">
+                                <geom type="sphere" name="end_effector" size="0.001" pos="-0.005 0.1935 0.1635" contype="0" conaffinity="0" rgba="1 0 0 1"/>
                             </body>
                         </body>
                     </body>
