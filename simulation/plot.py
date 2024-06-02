@@ -15,10 +15,9 @@ class RobotPlot:
         self.fig, self.ax = plt.subplots(6, 2, sharex='col', figsize=(4, 10))
         self.curr_time    = 0
         self.count        = 0
-        self.ani          = None
 
         # initial content (id, title, is_angle, value_generater, content)
-        self.times   = np.zeros((frames), dtype=float)
+        self.times   = np.zeros((frames, ), dtype=float)
         self.content = [
             [(0, 0) , "Joint 1 xyz"     , False, lambda: robot.read_ee_pos("joint1")        , np.zeros((frames, 3), dtype=float)],
             [(1, 0) , "Joint 2 xyz"     , False, lambda: robot.read_ee_pos("joint2")        , np.zeros((frames, 3), dtype=float)],
@@ -26,11 +25,11 @@ class RobotPlot:
             [(3, 0) , "Joint 4 xyz"     , False, lambda: robot.read_ee_pos("joint4")        , np.zeros((frames, 3), dtype=float)],
             [(4, 0) , "Joint 5 xyz"     , False, lambda: robot.read_ee_pos("joint5")        , np.zeros((frames, 3), dtype=float)],
             [(5, 0) , "Joint ee xyz"    , False, lambda: robot.read_ee_pos("end_effector")  , np.zeros((frames, 3), dtype=float)],
-            [(0, 1) , "Joint 1 angle"   , True , lambda: robot.read_position()[0]           , np.zeros((frames   ), dtype=float)],
-            [(1, 1) , "Joint 2 angle"   , True , lambda: robot.read_position()[1]           , np.zeros((frames   ), dtype=float)],
-            [(2, 1) , "Joint 3 angle"   , True , lambda: robot.read_position()[2]           , np.zeros((frames   ), dtype=float)],
-            [(3, 1) , "Joint 4 angle"   , True , lambda: robot.read_position()[3]           , np.zeros((frames   ), dtype=float)],
-            [(4, 1) , "Joint 5 angle"   , True , lambda: robot.read_position()[4]           , np.zeros((frames   ), dtype=float)],
+            [(0, 1) , "Joint 1 angle"   , True , lambda: robot.read_position()[0]           , np.zeros((frames,  ), dtype=float)],
+            [(1, 1) , "Joint 2 angle"   , True , lambda: robot.read_position()[1]           , np.zeros((frames,  ), dtype=float)],
+            [(2, 1) , "Joint 3 angle"   , True , lambda: robot.read_position()[2]           , np.zeros((frames,  ), dtype=float)],
+            [(3, 1) , "Joint 4 angle"   , True , lambda: robot.read_position()[3]           , np.zeros((frames,  ), dtype=float)],
+            [(4, 1) , "Joint 5 angle"   , True , lambda: robot.read_position()[4]           , np.zeros((frames,  ), dtype=float)],
         ]
         self.ax[5, 1].axis("off")
 
