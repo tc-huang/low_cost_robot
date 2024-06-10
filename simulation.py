@@ -41,14 +41,14 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     # print('box', r.read_ee_pos('box'))
     # print(r.read_ee_pos())
     if(is_picked):
-      target_pos = r.inverse_kinematics(r.read_ee_pos('box'))
+      target_pos = r.inverse_kinematics(r.read_ee_pos('box')) # weird result
       target_pos[1] = target_pos[1] - target_pos[1] * 0.1
     else:
-      target_pos = r.inverse_kinematics(r.read_ee_pos('box'))
+      target_pos = r.inverse_kinematics(r.read_ee_pos('box')) # weird result
     
     
     if(is_open):
-      target_pos[5] = -0.7
+      target_pos[5] = -1
     else:
       target_pos[5] = -0.3
     
