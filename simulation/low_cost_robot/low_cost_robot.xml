@@ -1,6 +1,5 @@
 <mujoco model="low_cost_robot">
-  <compiler angle="radian" meshdir="meshes" autolimits="true"/>
-  <option cone="elliptic" impratio="10" timestep="0.001"/>
+  <compiler angle="radian" meshdir="meshes"/>
   <asset>
     <mesh name="base_link" file="base_link.stl" scale="0.001 0.001 0.001"/>
     <mesh name="link1_1" file="link1_1.stl" scale="0.001 0.001 0.001"/>
@@ -10,67 +9,66 @@
     <mesh name="gripper_static_1" file="gripper_static_1.stl" scale="0.001 0.001 0.001"/>
     <mesh name="gripper_moving_1" file="gripper_moving_1.stl" scale="0.001 0.001 0.001"/>
   </asset>
+
   <default>
-      <default class="low_cost_robot">
+    <default class="low_cost_robot">
         <general biastype="affine"/>
         <!-- NOTE: the joint pos are defined in world frame, so they're built by summing over urdf relative joint positioning -->
         <!-- NOTE: values other than axis and pos here have not been properly identified -->
         <joint axis="0 1 0"/>
         <default class="joint1">
-            <joint axis="0 0 1" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <joint range="-3.14158 3.14158" damping="1.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="30"/>
         </default>
         <default class="joint2">
-            <joint axis="1 0 0" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <joint range="-3.14158 3.14158" damping="1.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="30"/>
         </default>
         <default class="joint3">
-            <joint axis="1 0 0" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <joint range="-3.14158 3.14158" damping="1.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="30"/>
         </default>
         <default class="joint4">
-            <joint axis="1 0 0" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <joint range="-3.14158 3.14158" damping="1.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="30"/>
         </default>
         <default class="joint5">
-            <joint axis="0 0 -1" pos="0 0 0" range="-2.45 0.032" damping="0.1"/>
-            <position ctrlrange="-2.45 0.032" kp="25"/>
+            <joint range="-3.14158 3.14158" damping="1.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="30"/>
         </default>
         <default class="joint_gripper">
-          <joint axis="0 -1 0" pos="0 0 0" range="-2.45 0.032" damping="0.1"/>
-          <position ctrlrange="-2.45 0.032" kp="25"/>
+            <joint range="-2.45 0.032" damping="1.5"/>
+            <position ctrlrange="-2.45 0.032" kp="30"/>
         </default>
     </default>
-  </default>
+</default>
+
   <worldbody>
     <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="base_link"/>
     <body name="link1_1" pos="0 0 0.039">
       <inertial pos="-0.000621664 -0.0119142 0.0154002" quat="0.494768 0.505178 -0.505178 0.494768" mass="0.395606" diaginertia="0.000123021 0.000112 7.49792e-05"/>
-      <joint name="joint1" class="joint1"/>
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" class="joint1"/>
       <geom pos="0 0 -0.039" type="mesh" rgba="0.7 0.7 0.7 1" mesh="link1_1"/>
       <body name="link2_1" pos="-0.0002 0 0.0173">
         <inertial pos="0.000157789 -0.00121683 0.0716118" quat="0.689118 -0.0263852 0.0311302 0.723499" mass="0.391607" diaginertia="0.000537063 0.000519969 8.09683e-05"/>
-        <joint name="joint2" class="joint2"/>
+        <joint name="joint2" pos="0 0 0" axis="-1 0 0" class="joint2"/>
         <geom pos="0.0002 0 -0.0563" type="mesh" rgba="0.7 0.7 0.7 1" mesh="link2_1"/>
         <body name="link3_1" pos="0.00025 0.014791 0.108347">
           <inertial pos="7.24367e-05 0.0506989 0.0028508" quat="0.501011 0.498987 -0.501011 0.498987" mass="0.440469" diaginertia="0.000322 0.000302004 5.4996e-05"/>
-          <joint name="joint3" class="joint3"/>
+          <joint name="joint3" pos="0 0 0" axis="1 0 0" class="joint3"/>
           <geom pos="-5e-05 -0.014791 -0.164647" type="mesh" rgba="0.7 0.7 0.7 1" mesh="link3_1"/>
           <body name="link4_1" pos="0.000125 0.090467 0.002747">
             <inertial pos="-0.00473856 8.6083e-06 -0.0265782" quat="0.653281 0.270598 0.270598 0.653281" mass="0.154644" diaginertia="3.9e-05 2.7e-05 2.1e-05"/>
-            <joint name="joint4" class="joint4"/>
+            <joint name="joint4" pos="0 0 0" axis="1 0 0" class="joint4"/>
             <geom pos="-0.000175 -0.105258 -0.167394" type="mesh" rgba="0.7 0.7 0.7 1" mesh="link4_1"/>
             <body name="gripper_static_1" pos="0.001353 7e-06 -0.045">
               <inertial pos="0.00544111 0.000115633 -0.0190522" quat="0.687452 -0.165558 -0.165558 0.687452" mass="0.230086" diaginertia="8.4e-05 7.82036e-05 3.37964e-05"/>
-              <joint name="joint5" class="joint5"/>
+              <joint name="joint5" pos="0 0 0" axis="0 0 -1" class="joint5"/>
               <geom pos="-0.001528 -0.105265 -0.122394" type="mesh" rgba="0.7 0.7 0.7 1" mesh="gripper_static_1"/>
               <body name="gripper_moving_1" pos="-0.0074 -0.00025 -0.01315">
                 <inertial pos="0.0010956 0.000310904 -0.0251131" quat="0.997878 0 -0.0651045 0" mass="0.100606" diaginertia="2.72621e-05 1.9e-05 1.17379e-05"/>
-                <joint name="joint_gripper" class="joint_gripper"/>
+                <joint name="joint_gripper" pos="0 0 0" axis="0 -1 0" class="joint_gripper"/>
                 <geom pos="0.005872 -0.105015 -0.109244" type="mesh" rgba="0.7 0.7 0.7 1" mesh="gripper_moving_1"/>
-              </body>
-              <body name='end_effector'>
-                <geom type="sphere" name="end_effector" size="0.001" pos="0.007 0 -0.068" contype="0" conaffinity="0" rgba="1 0 0 1"/>
               </body>
             </body>
           </body>
@@ -86,5 +84,11 @@
     <position class="joint4" name="joint4" joint="joint4"/>
     <position class="joint5" name="joint5" joint="joint5"/>
     <position class="joint_gripper" name="joint_gripper" joint="joint_gripper"/>
-    </actuator>
+    <!-- <velocity name="joint1_v" joint="joint1" kv="5"/>
+    <velocity name="joint2_v" joint="joint2" kv="5"/>
+    <velocity name="joint3_v" joint="joint3" kv="5"/>
+    <velocity name="joint4_v" joint="joint4" kv="5"/>
+    <velocity name="joint5_v" joint="joint5" kv="5"/>
+    <velocity name="joint_gripper_v" joint="joint_gripper" kv="5"/> -->
+  </actuator>
 </mujoco>
