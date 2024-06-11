@@ -70,6 +70,8 @@
                 <joint name="joint_gripper" pos="0 0 0" axis="0 -1 0" class="joint_gripper"/>
                 <geom pos="0.005872 -0.105015 -0.109244" type="mesh" rgba="0.7 0.7 0.7 1" mesh="gripper_moving_1"/>
               </body>
+              <!-- <geom type="sphere" name="TCP" size="0.001" pos="0.0072 0 -0.0685" contype="0" conaffinity="0" rgba="1 0 0 1"/> -->
+              <site name="TCP" size="0.001" pos="0.0072 0 -0.0685" rgba="1 0 0 1"/>
             </body>
           </body>
         </body>
@@ -84,11 +86,5 @@
     <position class="joint4" name="joint4" joint="joint4"/>
     <position class="joint5" name="joint5" joint="joint5"/>
     <position class="joint_gripper" name="joint_gripper" joint="joint_gripper"/>
-    <!-- <velocity name="joint1_v" joint="joint1" kv="5"/>
-    <velocity name="joint2_v" joint="joint2" kv="5"/>
-    <velocity name="joint3_v" joint="joint3" kv="5"/>
-    <velocity name="joint4_v" joint="joint4" kv="5"/>
-    <velocity name="joint5_v" joint="joint5" kv="5"/>
-    <velocity name="joint_gripper_v" joint="joint_gripper" kv="5"/> -->
   </actuator>
 </mujoco>
