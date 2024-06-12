@@ -52,20 +52,24 @@ class SimulatedRobot:
         """
         return self.d.qvel
 
-    def read_ee_pos(self, joint_name='end_effector'):
+    def read_ee_pos(self, joint_name='TCP'):
         """
         :param joint_name: name of the end effector joint
         :return: numpy array of end effector position
         """
+        if(joint_name=='TCP'):
+            return self.d.site('TCP').xpos
+
         joint_id = self.m.body(joint_name).id
         # return self.d.geom_xpos[joint_id]
         return self.d.xpos[joint_id]
 
-    def inverse_kinematics(self, ee_target_pos, joint_name='end_effector'):
+    def inverse_kinematics(self, ee_target_pos, joint_name='TCP'):
         """
         :param ee_target_pos: numpy array of target end effector position
         :param joint_name: name of the end effector joint
         """
+        
         joint_id = self.m.body(joint_name).id
         # get the current end effector position
         ee_pos = self.d.geom_xpos[joint_id]
