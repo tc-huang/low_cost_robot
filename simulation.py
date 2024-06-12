@@ -13,17 +13,14 @@ robotPlot = RobotPlot(r, period=m.opt.timestep, frames=500, length=3)
 
 # Integration timestep in seconds. This corresponds to the amount of time the joint
 # velocities will be integrated for to obtain the desired joint positions.
-integration_dt: float = 0.1
+integration_dt: float = 0.01
 
 # Damping term for the pseudoinverse. This is used to prevent joint velocities from
 # becoming too large when the Jacobian is close to singular.
-damping: float = 1e-4
+damping: float = 1e-10
 
 # Whether to enable gravity compensation.
 gravity_compensation: bool = True
-
-# Simulation timestep in seconds.
-dt: float = 0.002
 
 # Maximum allowable joint velocity in rad/s. Set to 0 to disable.
 max_angvel = 0.0
@@ -50,7 +47,7 @@ def mse(x, y):
   return np.mean((np.array(x) - np.array(y)) ** 2)
 
 with mujoco.viewer.launch_passive(m, d) as viewer:
-  ee_id = m.site("end_effector").id
+  ee_id = m.site("TCP").id
   target_id = m.body("box").id
   mocap_id  = m.body(target_id).mocapid[0]
 
@@ -60,7 +57,7 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
   circle = Circle(
     center = np.array([0.1, 0.1]), 
     point  = d.mocap_pos[mocap_id],
-    freq   = 1
+    freq   = 0.2
   )
   
   joint_names  = [
@@ -90,9 +87,9 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
   while viewer.is_running():
     d.mocap_pos[mocap_id, 0:2] = circle(d.time)
 
-    # target = d.mocap_pos[mocap_id]  # move to box
-    target = d.site(ee_id).xpos
-    target[0:2] = circle(d.time)
+    target = d.mocap_pos[mocap_id].copy()  # move to box
+    # target = d.site(ee_id).xpos
+    # target[0:2] = circle(d.time)
 
     error_pos[:] = target - d.site(ee_id).xpos
     # print(error_pos)
@@ -103,10 +100,10 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
     q = d.qpos.copy()
     mujoco.mj_integratePos(m, q, dq, integration_dt)
-    # print(q[dof_ids])
-    np.clip(q, *m.jnt_range.T, out=q)
-    # print(q[dof_ids])
-    d.ctrl[actuator_ids] = q[dof_ids]
+    qc = np.zeros(q.shape)
+    np.clip(q, *m.jnt_range.T, out=qc)
+    # print(q[dof_ids] - qc[dof_ids])
+    d.ctrl[actuator_ids] = qc[dof_ids]
 
     robotPlot.next()
 

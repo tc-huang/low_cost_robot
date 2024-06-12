@@ -25,7 +25,7 @@ class RobotPlot:
             [(2, 0) , "Joint 3 xyz"     , False, lambda: robot.read_ee_pos("link3_1")         , np.zeros((frames, 3), dtype=float)],
             [(3, 0) , "Joint 4 xyz"     , False, lambda: robot.read_ee_pos("link4_1")         , np.zeros((frames, 3), dtype=float)],
             [(4, 0) , "Joint 5 xyz"     , False, lambda: robot.read_ee_pos("gripper_static_1"), np.zeros((frames, 3), dtype=float)],
-            [(5, 0) , "Joint ee xyz"    , False, lambda: robot.d.site("end_effector").xpos    , np.zeros((frames, 3), dtype=float)],
+            [(5, 0) , "Joint ee xyz"    , False, lambda: robot.d.site("TCP").xpos             , np.zeros((frames, 3), dtype=float)],
             [(0, 1) , "Joint 1 angle"   , True , lambda: robot.read_position()[0]             , np.zeros((frames   ), dtype=float)],
             [(1, 1) , "Joint 2 angle"   , True , lambda: robot.read_position()[1]             , np.zeros((frames   ), dtype=float)],
             [(2, 1) , "Joint 3 angle"   , True , lambda: robot.read_position()[2]             , np.zeros((frames   ), dtype=float)],
