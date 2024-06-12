@@ -8,6 +8,7 @@ class SimulatedRobot:
         :param m: mujoco model
         :param d: mujoco data
         """
+        self.integration_dt = 0.1
         self.m = m
         self.d = d
 
@@ -43,7 +44,7 @@ class SimulatedRobot:
         """
         :return: numpy array of current joint positions in range [0, 4096]
         """
-        return self.d.qpos[:6]
+        return self.d.qpos[:6].copy()
 
     def read_velocity(self):
         """
@@ -68,16 +69,19 @@ class SimulatedRobot:
         """
         joint_id = self.m.body(joint_name).id
         # get the current end effector position
-        ee_pos = self.d.geom_xpos[joint_id]
+        ee_pos = self.read_ee_pos(joint_name)
         # compute the jacobian
         jac = np.zeros((3, self.m.nv))
         mujoco.mj_jacBodyCom(self.m, self.d, jac, None, joint_id)
         # compute target joint velocities
-        qpos = self.read_position()
         qdot = np.dot(np.linalg.pinv(jac[:, :6]), ee_target_pos - ee_pos)
         # apply the joint velocities
-        q_target_pos = qpos + qdot
-        return q_target_pos
+        qpos = self.read_position()
+        # q_target_pos = qpos + qdot
+        mujoco.mj_integratePos(self.m, qpos, qdot, self.integration_dt)
+        return qpos
 
     def set_target_pos(self, target_pos):
+        # print(self.m.jnt_range.T)
+        np.clip(target_pos, *self.m.jnt_range.T[:, 0:6], out=target_pos)
         self.d.ctrl = target_pos

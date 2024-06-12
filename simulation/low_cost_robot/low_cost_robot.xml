@@ -18,27 +18,27 @@
         <joint axis="0 1 0"/>
         <default class="joint1">
             <joint axis="0 0 1" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <position ctrlrange="-3.14158 3.14158" />
         </default>
         <default class="joint2">
-            <joint axis="1 0 0" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <joint axis="1 0 0" pos="0 0 0" range="0 1.57" damping="0.1"/>
+            <position ctrlrange="0 1.57" />
         </default>
         <default class="joint3">
-            <joint axis="1 0 0" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <joint axis="1 0 0" pos="0 0 0" range="0 1.57" damping="0.1"/>
+            <position ctrlrange="0 1.57" />
         </default>
         <default class="joint4">
-            <joint axis="1 0 0" pos="0 0 0" range="-3.14158 3.14158" damping="0.1"/>
-            <position ctrlrange="-3.14158 3.14158" kp="25"/>
+            <joint axis="1 0 0" pos="0 0 0" range="-1.57 3.14158" damping="0.1"/>
+            <position ctrlrange="-1.57 3.14158" />
         </default>
         <default class="joint5">
             <joint axis="0 0 -1" pos="0 0 0" range="-2.45 0.032" damping="0.1"/>
-            <position ctrlrange="-2.45 0.032" kp="25"/>
+            <position ctrlrange="-2.45 0.032" />
         </default>
         <default class="joint_gripper">
           <joint axis="0 -1 0" pos="0 0 0" range="-2.45 0.032" damping="0.1"/>
-          <position ctrlrange="-2.45 0.032" kp="25"/>
+          <position ctrlrange="-2.45 0.032" />
         </default>
     </default>
   </default>
@@ -68,9 +68,7 @@
                 <inertial pos="0.0010956 0.000310904 -0.0251131" quat="0.997878 0 -0.0651045 0" mass="0.100606" diaginertia="2.72621e-05 1.9e-05 1.17379e-05"/>
                 <joint name="joint_gripper" class="joint_gripper"/>
                 <geom pos="0.005872 -0.105015 -0.109244" type="mesh" rgba="0.7 0.7 0.7 1" mesh="gripper_moving_1"/>
-              </body>
-              <body name='end_effector'>
-                <geom type="sphere" name="end_effector" size="0.001" pos="0.007 0 -0.068" contype="0" conaffinity="0" rgba="1 0 0 1"/>
+                <site type="sphere" name="end_effector" size="0.001" pos="0.007 0 -0.068" rgba="1 0 0 1"/>
               </body>
             </body>
           </body>
