@@ -9,7 +9,7 @@ from simulation.interface import SimulatedRobot
 
 np.random.seed(42)
 
-class SimulatedRobotClass:
+class Simulation:
 
   def __init__(self, n_epoch=100) -> None:
     self.m = mujoco.MjModel.from_xml_path('simulation/low_cost_robot/scene.xml')
@@ -113,5 +113,5 @@ class SimulatedRobotClass:
         epoch += 1
 
 if __name__ == '__main__':
-  r = SimulatedRobotClass(100)
+  r = Simulation(100)
   r.run()
