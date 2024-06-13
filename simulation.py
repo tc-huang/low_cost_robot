@@ -66,13 +66,6 @@ class Simulation:
     init_pos_idx, target_xpos_idx = self.get_diff_idxs()
     init_pos = self.workspace[init_pos_idx]['pos']
     target_xpos = self.workspace[target_xpos_idx]['TCP']
-
-    # for i in self.workspace: print(i['pos'], i['TCP'])
-    # exit()
-
-    # print(init_pos_idx, init_pos)
-    # print(target_xpos_idx, target_xpos)
-
     return init_pos_idx, target_xpos_idx, init_pos, target_xpos
   
   def next_pos(self):
