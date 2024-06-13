@@ -75,14 +75,25 @@ class SimulatedRobotClass:
         
         # self.random_gen_position_xpos()
         
-        if(self.cnt < 1000):
+        if(self.cnt < 200):
           self.r.set_target_pos(self.init_pos)
         else:
-          self.r.set_target_pos(self.r.inverse_kinematics(self.target_xpos))
+          for i in self.r.inverse_kinematics(self.target_xpos):
+            self.r.set_target_pos(i)
+            self.cnt += 1
+            print(self.cnt, np.subtract(self.r.read_ee_pos(), self.target_xpos),end = '\r')
+            step_start = time.time()
+            mujoco.mj_step(self.m, self.d)
+            viewer.sync()
+            # Rudimentary time keeping, will drift relative to wall clock.
+            time_until_next_step = self.m.opt.timestep - (time.time() - step_start)
+            if time_until_next_step > 0:
+              time.sleep(time_until_next_step)
+
+
+
         self.cnt += 1
         print(self.cnt, np.subtract(self.r.read_ee_pos(), self.target_xpos),end = '\r')
-        
-        
         step_start = time.time()
         mujoco.mj_step(self.m, self.d)
         viewer.sync()
