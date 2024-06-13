@@ -79,7 +79,7 @@ class Simulation:
     return
 
   def run(self):
-    with mujoco.viewer.launch_passive(self.m, self.d) as viewer:
+    with mujoco.viewer.launch_passive(model=self.m, data=self.d, show_left_ui=False, show_right_ui=False) as viewer:
       # start = time.time()
       is_running = viewer.is_running()
       epoch = 0
@@ -88,6 +88,7 @@ class Simulation:
         self.cnt = 0
         self.init_pos_idx, self.target_xpos_idx, self.init_pos, self.target_xpos = self.get_simulation_position_xpos()
         self.robotPlot.reset()
+        
         for i in self.next_pos():
           self.r.set_target_pos(i)
           self.cnt += 1
@@ -105,5 +106,5 @@ class Simulation:
         epoch += 1
 
 if __name__ == '__main__':
-  r = Simulation(100)
+  r = Simulation(n_epoch=100)
   r.run()
