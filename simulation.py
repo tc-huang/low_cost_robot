@@ -6,6 +6,7 @@ import pickle as pkl
 import mujoco.viewer
 from simulation.plot import RobotPlot
 from simulation.interface import SimulatedRobot
+from simulation.utils import read_pkl
 
 np.random.seed(42)
 
@@ -17,7 +18,7 @@ class Simulation:
     self.r = SimulatedRobot(self.m, self.d)
     self.robotPlot = RobotPlot(self.r, period=self.m.opt.timestep, frames=60, length=0.3)
     self.cnt = 0
-    self.workspace = self.read_pkl('workspace.pkl')
+    self.workspace = read_pkl('workspace.pkl')
     self.n_workspace = len(self.workspace)
     self.n_epoch = n_epoch
 
@@ -53,11 +54,6 @@ class Simulation:
     self.cnt += 1
     print(self.cnt, end = '\r')
     self.r.set_target_pose(self.pos)
-
-  def read_pkl(self, file_names):
-    with open(file_names, 'rb') as f:
-      workspace = pkl.load(f)  
-    return workspace
 
   def get_diff_idxs(self):
     init_pos_idx = np.random.randint(0, self.n_workspace-1)
