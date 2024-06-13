@@ -21,12 +21,16 @@ class Simulation:
     self.n_workspace = len(self.workspace)
     self.n_epoch = n_epoch
 
-  def random_gen_pos(self):
-    rst = np.random.uniform(-3.14158 / 2, 3.14158 / 2, 6)
-    # rst[2] = np.random.uniform(-3.14158 / 2, 3.14158 / 2)
-    rst[4] = 0
-    rst[5] = 0
-    return rst
+  def random_gen_pose(self)->np.ndarray:
+    """Generate a random angle for the 6 joints of the robot.
+
+    Returns:
+        np.ndarray: 6 random angles for the 6 joints of the robot. (in radians)
+    """
+    joint_cfg = np.random.uniform(-3.14158 / 2, 3.14158 / 2, 6)
+    joint_cfg[4] = 0
+    joint_cfg[5] = 0
+    return joint_cfg
   
   def random_gen_position_xpos(self):
     if(self.cnt % 2000 == 0):
@@ -48,7 +52,7 @@ class Simulation:
       self.pos = self.random_gen_pos()
     self.cnt += 1
     print(self.cnt, end = '\r')
-    self.r.set_target_pos(self.pos)
+    self.r.set_target_pose(self.pos)
 
   def read_pkl(self, file_names):
     with open(file_names, 'rb') as f:
