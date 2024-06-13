@@ -5,6 +5,8 @@ import mujoco.viewer
 from simulation.interface import SimulatedRobot
 
 import numpy as np
+np.random.seed(42)
+
 import pickle as pkl
 
 class SimulatedRobotClass:
