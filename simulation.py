@@ -17,7 +17,6 @@ class Simulation:
     self.r = SimulatedRobot(self.m, self.d)
     self.robotPlot = RobotPlot(self.r, period=self.m.opt.timestep, frames=60, length=0.3)
     self.cnt = 0
-    self.workspace = []
     self.workspace = self.read_pkl('workspace.pkl')
     self.n_workspace = len(self.workspace)
     self.n_epoch = n_epoch
