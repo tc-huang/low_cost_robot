@@ -137,7 +137,7 @@ class SimulatedRobot:
         jacr = np.zeros((3, model.nv)) #rotational jacobian
         goal = ee_target_pos
         step_size = 0.5
-        tol = 0.01
+        tol = 0.0045
         alpha = 0.5
         init_q = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         damping = 0.15
