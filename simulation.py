@@ -155,12 +155,13 @@ class Simulation:
       # start = time.time()
       x, y, z = self.r.read_ee_pos()
       xpos = np.array([x, z])
-      # self.trace = Circle(xpos, other={"center": [0.1, 0.1], "freq": 0.5})
-      self.trace = Line(xpos, other={"another_point": [0.2, 0.2], "period": 2})
+      self.trace = Circle(xpos, other={"center": [0.1, 0.1], "freq": 0.5})
+      # self.trace = Line(xpos, other={"another_point": [0.2, 0.2], "period": 2})
       is_running = viewer.is_running()
       epoch = 0
-      while is_running: # and (epoch < self.n_epoch):
-      # while is_running and (epoch < self.n_epoch):
+      data = []
+      # while is_running: # and (epoch < self.n_epoch):
+      while is_running and (epoch < self.n_epoch):
         print(f"epoch: {epoch}")
         self.cnt = 0
         self.time += self.m.opt.timestep
@@ -182,8 +183,15 @@ class Simulation:
           # print(">", self.time)
           is_running = viewer.is_running()
           if not is_running: break
+        x, y, z = self.r.read_ee_pos()
+        j0, j1, j2, j3, j4, j5 = self.r.read_position()
+        data.append({"x": x, "y": y, "z": z, "j0": j0, "j1": j1, "j2": j2, "j3": j3, "j4": j4, "j5": j5})
+          
         # if(cv2.waitKey(10) == ord('q')): break
         epoch += 1
+      df = pd.DataFrame(data)
+      with open("circle.csv", "wt") as f:
+        df.to_csv(f)
   
   def exp1(self, ik_method,samples = 100, tol = 0.001, limit_iter = 200, file_name = 'exp1'):
     #Init variables.
@@ -244,8 +252,8 @@ class Simulation:
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument('--n_epoch', type=int, default=100, help='Number of epochs')
-  parser.add_argument('--task', type=str, default='plot_samples', help='Task to perform')
+  parser.add_argument('--n_epoch', type=int, default=10000, help='Number of epochs')
+  parser.add_argument('--task', type=str, default='run', help='Task to perform')
   parser.add_argument('--ik_method', type=str, default='GaussNewton', help='IK method to use GradientDescent, GaussNewton, LevenbergMarquardt')
 
 
