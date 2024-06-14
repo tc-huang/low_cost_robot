@@ -1,13 +1,20 @@
+import os
 import cv2
 import time
 import mujoco
 import argparse
 import numpy as np
+import pandas as pd
 import pickle as pkl
 import mujoco.viewer
+import mediapy as media
 from simulation.plot import RobotPlot
 from simulation.interface import SimulatedRobot
 from simulation.utils import read_pkl
+
+from ik.gradient_descent import GradientDescentIK
+from ik.gauss_newton import GaussNewtonIK
+from ik.levenberg_marquardt import LevenbegMarquardtIK
 
 np.random.seed(42)
 
@@ -105,11 +112,36 @@ class Simulation:
           if not is_running: break
         cv2.waitKey()
         epoch += 1
+  
+  def exp1(self, ik_method):
+
+    ik_method_dict = {
+      'GradientDescent': GaussNewtonIK,
+      'GaussNewton': GaussNewtonIK,
+      'LevenbergMarquardt': LevenbegMarquardtIK
+    }
+    
+    if ik_method not in ik_method_dict:
+      print("Invalid ik_method")
+      return
+    
+    if not os.path.exists(f'./exp_data/{ik_method}'):
+      os.makedirs(f'./exp_data/{ik_method}')
+      
+    
+    
+    
+    
+    
+    
+    
+
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--n_epoch', type=int, default=100, help='Number of epochs')
   parser.add_argument('--task', type=str, default='run', help='Task to perform')
+  parser.add_argument('--ik_method', type=str, default='', help='IK method to use')
   
   args = parser.parse_args()
   n_epoch = args.n_epoch
@@ -118,3 +150,5 @@ if __name__ == '__main__':
   r = Simulation(n_epoch)
   if task == 'run':
     r.run()
+  if task == 'exp1':
+    pass
