@@ -6,7 +6,7 @@ from ik.ik import IK
 #Levenberg-Marquardt method
 class LevenbegMarquardtIK(IK):
     
-    def __init__(self, model, data, step_size, tol, alpha, jacp, jacr, damping):
+    def __init__(self, model, data, step_size, tol, alpha, jacp, jacr, damping, **kwargs):
         super().__init__(model, data, step_size, tol, alpha, jacp, jacr)
         self.damping = damping
     

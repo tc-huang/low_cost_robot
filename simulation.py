@@ -1,5 +1,7 @@
 import os
 import cv2
+import pandas as pd
+import matplotlib.pyplot as plt
 import time
 import mujoco
 import argparse
@@ -183,10 +185,19 @@ class Simulation:
         # if(cv2.waitKey(10) == ord('q')): break
         epoch += 1
   
-  def exp1(self, ik_method):
+  def exp1(self, ik_method,samples = 100, tol = 0.001, limit_iter = 200, file_name = 'exp1'):
+    #Init variables.
+    model = self.m
+    data = self.d
+    jacp = np.zeros((3, model.nv)) #translation jacobian
+    jacr = np.zeros((3, model.nv)) #rotational jacobian
+    step_size = 0.5
+    alpha = 0.5
+    damping = 0.15
+    
 
     ik_method_dict = {
-      'GradientDescent': GaussNewtonIK,
+      'GradientDescent': GradientDescentIK,
       'GaussNewton': GaussNewtonIK,
       'LevenbergMarquardt': LevenbegMarquardtIK
     }
@@ -197,7 +208,31 @@ class Simulation:
     
     if not os.path.exists(f'./exp_data/{ik_method}'):
       os.makedirs(f'./exp_data/{ik_method}')
-      
+    
+    with open(f'./exp_data/{ik_method}/{file_name}.csv', 'w') as f:
+      f.write(f"xpos_error,iterations\n")
+
+    for i in range(samples):
+      init_pos_idx, target_xpos_idx, init_pos, target_xpos = self.get_simulation_position_xpos()
+      configs = {
+        'model':model,
+        'data':data,
+        'step_size':step_size,
+        'tol':tol,
+        'alpha':alpha,
+        'jacp':jacp,
+        'jacr':jacr,
+        'damping':damping
+      }
+      ik = ik_method_dict[ik_method](**configs)
+      #Get desire point
+      mujoco.mj_resetDataKeyframe(model, data, 1) #reset qpos to initial value
+      norm_err, iterations = ik.calculate(target_xpos, init_pos, limit_iter) #calculate the qpos
+      print(i, norm_err, iterations, end = '\r')
+      with open(f'./exp_data/{ik_method}/{file_name}.csv', 'a') as f:
+        f.write(f"{norm_err},{iterations}\n")
+
+        
     
     
     
@@ -210,9 +245,11 @@ class Simulation:
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--n_epoch', type=int, default=100, help='Number of epochs')
-  parser.add_argument('--task', type=str, default='run', help='Task to perform')
-  parser.add_argument('--ik_method', type=str, default='', help='IK method to use')
-  
+  parser.add_argument('--task', type=str, default='plot_samples', help='Task to perform')
+  parser.add_argument('--ik_method', type=str, default='GaussNewton', help='IK method to use GradientDescent, GaussNewton, LevenbergMarquardt')
+
+
+
   args = parser.parse_args()
   n_epoch = args.n_epoch
   task = args.task
@@ -221,4 +258,15 @@ if __name__ == '__main__':
   if task == 'run':
     r.run()
   if task == 'exp1':
-    pass
+    r.exp1(args.ik_method, tol = 0.000000001, limit_iter = 200, file_name='iter_200')
+  if task == 'plot_samples':
+    target_path = './exp_data/LevenbergMarquardt/tol_0_001'
+
+    df = pd.read_csv(f'{target_path}.csv')
+    plt.figure('plot_samples')
+    plt.scatter(df['xpos_error'], df['iterations'])
+    plt.xlabel('xpos_error')
+    plt.ylabel('iterations')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.savefig(f'{target_path}.png')

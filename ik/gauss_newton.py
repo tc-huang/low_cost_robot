@@ -6,7 +6,7 @@ from ik.ik import IK
 # Gauss-Newton method
 class GaussNewtonIK(IK):
     
-    def __init__(self, model, data, step_size, tol, alpha, jacp, jacr):
+    def __init__(self, model, data, step_size, tol, alpha, jacp, jacr, **kwargs):
         super().__init__(model, data, step_size, tol, alpha, jacp, jacr)
     
     # Gauss-Newton pseudocode implementation
