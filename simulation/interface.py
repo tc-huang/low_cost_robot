@@ -137,15 +137,16 @@ class SimulatedRobot:
         jacr = np.zeros((3, model.nv)) #rotational jacobian
         goal = ee_target_pos
         step_size = 0.5
-        tol = 0.0045
+        tol = 0.01
         alpha = 0.5
-        init_q = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        # init_q = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        init_q = self.read_position()
         damping = 0.15
 
         ik = LevenbegMarquardtIK(model, data, step_size, tol, alpha, jacp, jacr, damping)
 
         #Get desire point
-        mujoco.mj_resetDataKeyframe(model, data, 1) #reset qpos to initial value
+        # mujoco.mj_resetDataKeyframe(model, data, 1) #reset qpos to initial value
         for i, error in ik.calculate(goal, init_q, body_id): #calculate the qpos
             yield i, error
         return
