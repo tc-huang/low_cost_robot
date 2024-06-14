@@ -75,8 +75,10 @@ class Simulation:
   def get_simulation_position_xpos(self):
     init_pos_idx, target_xpos_idx = self.get_diff_idxs()
     init_pos = self.workspace[init_pos_idx]['pos']
+    init_xpos = self.workspace[init_pos_idx]['TCP']
+    target_pos = self.workspace[target_xpos_idx]['pos']
     target_xpos = self.workspace[target_xpos_idx]['TCP']
-    return init_pos_idx, target_xpos_idx, init_pos, target_xpos
+    return init_pos_idx, target_xpos_idx, init_pos, init_xpos, target_pos, target_xpos
   
   def next_pos(self):
     while self.cnt < 200:
@@ -115,6 +117,17 @@ class Simulation:
         cv2.waitKey()
         epoch += 1
   
+  def plot_exp1_samples(self, target_path):
+    df = pd.read_csv(f'{target_path}.csv')
+    print(df)
+    plt.figure('plot_samples')
+    plt.scatter(df['xpos_error'], df['iterations'])
+    plt.xlabel('xpos_error')
+    plt.ylabel('iterations')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.savefig(f'{target_path}.png')
+
   def exp1(self, ik_method,samples = 100, tol = 0.001, limit_iter = 200, file_name = 'exp1'):
     #Init variables.
     model = self.m
@@ -138,12 +151,11 @@ class Simulation:
     
     if not os.path.exists(f'./exp_data/{ik_method}'):
       os.makedirs(f'./exp_data/{ik_method}')
-    
-    with open(f'./exp_data/{ik_method}/{file_name}.csv', 'w') as f:
-      f.write(f"xpos_error,iterations\n")
+
+    results = []
 
     for i in range(samples):
-      init_pos_idx, target_xpos_idx, init_pos, target_xpos = self.get_simulation_position_xpos()
+      init_pos_idx, target_xpos_idx, init_pos, init_xpos, target_pos, target_xpos = self.get_simulation_position_xpos()
       configs = {
         'model':model,
         'data':data,
@@ -157,11 +169,26 @@ class Simulation:
       ik = ik_method_dict[ik_method](**configs)
       #Get desire point
       mujoco.mj_resetDataKeyframe(model, data, 1) #reset qpos to initial value
-      norm_err, iterations = ik.calculate(target_xpos, init_pos, limit_iter) #calculate the qpos
-      print(i, norm_err, iterations, end = '\r')
-      with open(f'./exp_data/{ik_method}/{file_name}.csv', 'a') as f:
-        f.write(f"{norm_err},{iterations}\n")
+      xpos_error, iterations = ik.calculate(target_xpos, init_pos, limit_iter) #calculate the qpos
+      print(i, xpos_error, iterations, end = '\r')
 
+      results.append(
+        {
+          'xpos_error':xpos_error,
+          'iterations':iterations,
+          'init_pos_idx':init_pos_idx,
+          'target_xpos_idx':target_xpos_idx,
+          'init_pos':init_pos, 
+          'init_xpos':init_xpos,
+          'target_pos':target_pos,
+          'target_xpos':target_xpos
+        }
+      )
+
+    df = pd.DataFrame(results)
+    df.to_csv(f'./exp_data/{ik_method}/{file_name}.csv', index = False)
+
+    self.plot_exp1_samples(f'./exp_data/{ik_method}/{file_name}')
         
     
     
@@ -175,7 +202,7 @@ class Simulation:
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--n_epoch', type=int, default=100, help='Number of epochs')
-  parser.add_argument('--task', type=str, default='plot_samples', help='Task to perform')
+  parser.add_argument('--task', type=str, default='exp1', help='Task to perform')
   parser.add_argument('--ik_method', type=str, default='GaussNewton', help='IK method to use GradientDescent, GaussNewton, LevenbergMarquardt')
 
 
@@ -188,15 +215,6 @@ if __name__ == '__main__':
   if task == 'run':
     r.run()
   if task == 'exp1':
-    r.exp1(args.ik_method, tol = 0.000000001, limit_iter = 200, file_name='iter_200')
+    r.exp1(args.ik_method, samples = 1000,tol = 1e-3, limit_iter = 2e4, file_name='tol_0_001')
   if task == 'plot_samples':
-    target_path = './exp_data/LevenbergMarquardt/tol_0_001'
-
-    df = pd.read_csv(f'{target_path}.csv')
-    plt.figure('plot_samples')
-    plt.scatter(df['xpos_error'], df['iterations'])
-    plt.xlabel('xpos_error')
-    plt.ylabel('iterations')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.savefig(f'{target_path}.png')
+    r.plot_exp1_samples(target_path = './exp_data/GaussNewton/tol_0_001')
