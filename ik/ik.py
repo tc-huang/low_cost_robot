@@ -22,15 +22,19 @@ class IK(ABC):
     def calculate_delta_q(self, error):
         pass
     
-    def calculate(self, goal, init_q):
+    def calculate(self, goal, init_q, limit_iter):
         """Calculate the desire joints angles for goal"""
         self.data.qpos = init_q
         mujoco.mj_forward(self.model, self.data)
         # current_pose = self.data.body(body_id).xpos
         current_pose = self.data.site('TCP').xpos
         error = np.subtract(goal, current_pose)
+        
+        iterations = 0
 
         while (np.linalg.norm(error) >= self.tol):
+            if(iterations >= limit_iter):
+                break
             delta_q = self.calculate_delta_q(error)
             #compute next step
             self.data.qpos += self.step_size * delta_q
@@ -41,4 +45,6 @@ class IK(ABC):
             #calculate new error
             # error = np.subtract(goal, self.data.body(body_id).xpos)
             error = np.subtract(goal, self.data.site('TCP').xpos)
-            print(f"\033[H\033[2Jerror:{error}")
+            # print(f"\033[H\033[2Jerror:{error}")
+            iterations += 1
+        return np.linalg.norm(error), iterations
