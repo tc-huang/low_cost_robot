@@ -1,6 +1,7 @@
 import cv2
 import time
 import mujoco
+import argparse
 import numpy as np
 import pickle as pkl
 import mujoco.viewer
@@ -106,5 +107,14 @@ class Simulation:
         epoch += 1
 
 if __name__ == '__main__':
-  r = Simulation(n_epoch=100)
-  r.run()
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--n_epoch', type=int, default=100, help='Number of epochs')
+  parser.add_argument('--task', type=str, default='run', help='Task to perform')
+  
+  args = parser.parse_args()
+  n_epoch = args.n_epoch
+  task = args.task
+  
+  r = Simulation(n_epoch)
+  if task == 'run':
+    r.run()
