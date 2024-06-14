@@ -1,3 +1,5 @@
+pandas
 mujoco
+mediapy
 matplotlib
 opencv-python
