@@ -1,16 +1,16 @@
 import os
 import cv2
-import pandas as pd
-import matplotlib.pyplot as plt
 import time
 import mujoco
 import argparse
 import numpy as np
+import pandas as pd
 import pickle as pkl
 import mujoco.viewer
+from simulation import utils 
+import matplotlib.pyplot as plt
 from simulation.plot import RobotPlot
 from simulation.interface import SimulatedRobot
-from simulation.utils import read_pkl
 
 from ik.gradient_descent import GradientDescentIK
 from ik.gauss_newton import GaussNewtonIK
@@ -18,69 +18,17 @@ from ik.levenberg_marquardt import LevenbegMarquardtIK
 
 np.random.seed(42)
 
-class Circle:
-  def __init__(self, point: np.ndarray, other: dict):
-    center = other['center']
-    if not isinstance(center, np.ndarray):
-      center = np.array(center)
-    assert(point .shape == (2, ))
-    assert(center.shape == (2, ))
-    freq   = other['freq']
-    diff = point - center
-    x, y = diff
-
-    self.center = center
-    self.theta  = np.arctan2([y], [x])[0]  # compute the angle
-    self.omega  = 2 * np.pi * freq
-    self.radius = np.linalg.norm(diff)
-    print(self.center, self.theta, self.omega, self.radius)
-
-  def __call__(self, t: float):
-    angle = self.omega * t + self.theta
-    ret = self.radius * np.array([np.cos(angle), np.sin(angle)]) + self.center
-    # print(ret)
-    return ret
-  
-class Line:
-  def __init__(self, point: np.ndarray, other: dict):
-    another_point = other['another_point']
-    period        = other['period']
-    if(not isinstance(another_point, np.ndarray)):
-      another_point = np.array(another_point)
-    
-    assert(point        .shape == (2, ))
-    assert(another_point.shape == (2, ))
-    
-    self.period = period
-    self.start  = point
-    self.vec    = (another_point - point) / period
-    self.sign   = True  # Is time change by postive 
-    self.prev_t = 0
-    self.temp_t = 0
-
-  def __call__(self, t: float):
-    diff_t = t - self.prev_t
-    self.temp_t += diff_t if (self.sign) else -diff_t
-    self.prev_t = t
-    if (self.temp_t < 0) or (self.temp_t > self.period):
-      self.temp_t = 2 * (self.period if self.sign else 0) - self.temp_t
-      self.sign   = not self.sign
-    print(self.temp_t)
-    ret = self.start + self.temp_t * self.vec
-    print(ret)
-    return ret
-
 class Simulation:
-
   def __init__(self, n_epoch=100) -> None:
     self.m = mujoco.MjModel.from_xml_path('simulation/low_cost_robot/scene.xml')
     self.d = mujoco.MjData(self.m)
     self.r = SimulatedRobot(self.m, self.d)
-    self.robotPlot = RobotPlot(self.r, period=self.m.opt.timestep, frames=60, length=2)
+    self.robotPlot = RobotPlot(self.r, period=self.m.opt.timestep, frames=120, length=3)
     self.cnt = 0
     self.time = 0.0
-    self.workspace = read_pkl('workspace.pkl')
+    self.workspace = utils.read_pkl('workspace.pkl')
     self.n_workspace = len(self.workspace)
+    self.epoch = 0
     self.n_epoch = n_epoch
     self.trace = None
 
@@ -133,18 +81,23 @@ class Simulation:
     return init_pos_idx, target_xpos_idx, init_pos, init_xpos, target_pos, target_xpos
   
   def next_pos(self):
-    # while self.cnt < 200:
-    #   yield self.init_pos
     # for next_pos, error in self.r.inverse_kinematics(self.target_xpos):
     #   print(f"\r{self.cnt}: error: {error} norm = {np.linalg.norm(error):.10f}              ", end='')
     #   self.robotPlot.next() # plot
     #   yield next_pos
     # print()
-    target_xpos = self.r.read_ee_pos().copy()
-    a, b = self.trace(self.time)
-    target_xpos[0] = a
-    target_xpos[2] = b
-    
+    x, y, z = 0.0, 0.2, 0.15
+    if self.epoch < 200 :
+      target_xpos = np.array([x, y, z])
+      self.time = 0
+    else:
+      target_xpos = self.r.read_ee_pos().copy()
+      a, b = self.trace(self.time)
+      target_xpos[0] = a
+      target_xpos[1] = y
+      target_xpos[2] = b
+    yield self.r.read_position()  # at least into for loop once
+    self.robotPlot.next() # plot
     for next_pos, error in self.r.inverse_kinematics(target_xpos):
       print(f"\r{self.cnt}: error: {error} norm = {np.linalg.norm(error):.10f}", end='')
       self.robotPlot.next() # plot
@@ -155,18 +108,20 @@ class Simulation:
   def run(self):
     with mujoco.viewer.launch_passive(model=self.m, data=self.d, show_left_ui=False, show_right_ui=False) as viewer:
       # start = time.time()
-      x, y, z = self.r.read_ee_pos()
+      x, y, z = 0.0, 0.2, 0.15
       xpos = np.array([x, z])
-      self.trace = Circle(xpos, other={"center": [0.1, 0.1], "freq": 0.5})
-      # self.trace = Line(xpos, other={"another_point": [0.2, 0.2], "period": 2})
+      save = True
+      csv_name = "result/circle.csv"
+      self.trace = utils.Circle(xpos, other={"center": [0.0, 0.1], "freq": 0.5})
+      # csv_name = "result/line.csv"
+      # self.trace = utils.Line(xpos, other={"another_point": [0.15, 0.1], "period": 2})
       is_running = viewer.is_running()
-      epoch = 0
+      self.epoch = 0
       data = []
       # while is_running: # and (epoch < self.n_epoch):
-      while is_running and (epoch < self.n_epoch):
-        print(f"epoch: {epoch}")
+      while is_running and (self.epoch < self.n_epoch):
+        print(f"epoch: {self.epoch}")
         self.cnt = 0
-        self.time += self.m.opt.timestep
         # self.init_pos_idx, self.target_xpos_idx, self.init_pos, self.target_xpos = self.get_simulation_position_xpos()
         # self.robotPlot.reset()
         for i in self.next_pos():
@@ -185,15 +140,16 @@ class Simulation:
           # print(">", self.time)
           is_running = viewer.is_running()
           if not is_running: break
-        x, y, z = self.r.read_ee_pos()
-        j0, j1, j2, j3, j4, j5 = self.r.read_position()
-        data.append({"x": x, "y": y, "z": z, "j0": j0, "j1": j1, "j2": j2, "j3": j3, "j4": j4, "j5": j5})
+          x, y, z = self.r.read_ee_pos()
+          j0, j1, j2, j3, j4, j5 = self.r.read_position()
+          data.append({"x": x, "y": y, "z": z, "j0": j0, "j1": j1, "j2": j2, "j3": j3, "j4": j4, "j5": j5})
           
         # if(cv2.waitKey(10) == ord('q')): break
-        epoch += 1
-      df = pd.DataFrame(data)
-      with open("circle.csv", "wt") as f:
-        df.to_csv(f)
+        self.epoch += 1
+      if(save):
+        df = pd.DataFrame(data)
+        with open(csv_name, "wt") as f:
+          df.to_csv(f)
   
   def plot_exp1_samples(self, target_path):
     df = pd.read_csv(f'{target_path}.csv')
