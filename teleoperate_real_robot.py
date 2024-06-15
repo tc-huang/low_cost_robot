@@ -1,11 +1,12 @@
 from robot import Robot
 from dynamixel import Dynamixel
 
-leader_dynamixel = Dynamixel.Config(baudrate=1_000_000, device_name='/dev/tty.usbmodem57380045631').instantiate()
-follower_dynamixel = Dynamixel.Config(baudrate=1_000_000, device_name='/dev/tty.usbserial-FT8ISNO8').instantiate()
-follower = Robot(follower_dynamixel, servo_ids=[1, 2, 3, 4, 6, 7])
-leader = Robot(leader_dynamixel, servo_ids=[1, 2, 3, 4, 6, 7])
+baudrate=57600
+leader_dynamixel = Dynamixel.Config(baudrate=baudrate, device_name='/dev/tty.usbmodem578E0213781').instantiate()
+leader = Robot(leader_dynamixel, servo_ids=[1, 2, 3, 4, 5, 6])
 leader.set_trigger_torque()
+follower_dynamixel = Dynamixel.Config(baudrate=baudrate, device_name='/dev/tty.usbmodem578E0212131').instantiate()
+follower = Robot(follower_dynamixel, servo_ids=[1, 2, 3, 4, 5, 6])
 
 
 while True:
