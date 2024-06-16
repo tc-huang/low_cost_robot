@@ -143,6 +143,7 @@ class Simulation:
           x, y, z = self.r.read_ee_pos()
           j0, j1, j2, j3, j4, j5 = self.r.read_position()
           data.append({"x": x, "y": y, "z": z, "j0": j0, "j1": j1, "j2": j2, "j3": j3, "j4": j4, "j5": j5})
+          print(len(data))
           
         # if(cv2.waitKey(10) == ord('q')): break
         self.epoch += 1
