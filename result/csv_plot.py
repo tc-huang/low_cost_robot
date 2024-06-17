@@ -20,6 +20,6 @@ def csv_plot(file_name):
 
 if __name__ == "__main__":
     file_name = "circle.csv"
-    file_name = "line.csv"
+    # file_name = "line.csv"
     
     csv_plot(file_name)

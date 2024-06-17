@@ -54,7 +54,7 @@ class Line:
     if (self.temp_t < 0) or (self.temp_t > self.half_period):
       self.temp_t = 2 * (self.half_period if self.sign else 0) - self.temp_t
       self.sign   = not self.sign
-    print(self.temp_t)
+    # print(self.temp_t)
     ret = self.start + self.temp_t * self.vec
-    print(ret)
+    # print(ret)
     return ret

@@ -136,8 +136,8 @@ class SimulatedRobot:
         jacp = np.zeros((3, model.nv)) #translation jacobian
         jacr = np.zeros((3, model.nv)) #rotational jacobian
         goal = ee_target_pos
-        step_size = 0.5
-        tol = 0.01
+        step_size = 1.0
+        tol = 0.001
         alpha = 0.5
         # init_q = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         init_q = self.read_position()
@@ -147,8 +147,9 @@ class SimulatedRobot:
 
         #Get desire point
         # mujoco.mj_resetDataKeyframe(model, data, 1) #reset qpos to initial value
-        for i, error in ik.calculate(goal, init_q, body_id): #calculate the qpos
-            yield i, error
+        for iter, item in enumerate(ik.calculate(goal, init_q, body_id)): #calculate the qpos
+            if iter >= 200: break
+            yield item
         return
         result = data.qpos.copy()
         data.qpos = result

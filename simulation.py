@@ -99,10 +99,10 @@ class Simulation:
     yield self.r.read_position()  # at least into for loop once
     self.robotPlot.next() # plot
     for next_pos, error in self.r.inverse_kinematics(target_xpos):
-      print(f"\r{self.cnt}: error: {error} norm = {np.linalg.norm(error):.10f}", end='')
+      # print(f"\r{self.cnt}: error: {error} norm = {np.linalg.norm(error):.10f}", end='')
       self.robotPlot.next() # plot
       yield next_pos
-    print()
+    # print()
     return
 
   def run(self):
@@ -120,7 +120,7 @@ class Simulation:
       data = []
       # while is_running: # and (epoch < self.n_epoch):
       while is_running and (self.epoch < self.n_epoch):
-        print(f"epoch: {self.epoch}")
+        print(f"\repoch: {self.epoch: 04d}/{self.n_epoch}", end='')
         self.cnt = 0
         # self.init_pos_idx, self.target_xpos_idx, self.init_pos, self.target_xpos = self.get_simulation_position_xpos()
         # self.robotPlot.reset()
@@ -143,7 +143,7 @@ class Simulation:
           x, y, z = self.r.read_ee_pos()
           j0, j1, j2, j3, j4, j5 = self.r.read_position()
           data.append({"x": x, "y": y, "z": z, "j0": j0, "j1": j1, "j2": j2, "j3": j3, "j4": j4, "j5": j5})
-          print(len(data))
+          # print(len(data))
           
         # if(cv2.waitKey(10) == ord('q')): break
         self.epoch += 1
