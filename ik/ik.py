@@ -40,6 +40,7 @@ class IK(ABC):
             self.data.qpos += self.step_size * delta_q
             #check limits
             self.check_joint_limits(self.data.qpos)
+            yield self.data.qpos
             #compute forward kinematics
             mujoco.mj_forward(self.model, self.data) 
             #calculate new error

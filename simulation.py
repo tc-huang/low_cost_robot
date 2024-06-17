@@ -98,7 +98,7 @@ class Simulation:
       target_xpos[2] = b
     yield self.r.read_position()  # at least into for loop once
     self.robotPlot.next() # plot
-    for next_pos, error in self.r.inverse_kinematics(target_xpos):
+    for next_pos in self.r.inverse_kinematics(target_xpos):
       # print(f"\r{self.cnt}: error: {error} norm = {np.linalg.norm(error):.10f}", end='')
       self.robotPlot.next() # plot
       yield next_pos
@@ -111,10 +111,10 @@ class Simulation:
       x, y, z = 0.0, 0.2, 0.15
       xpos = np.array([x, z])
       save = True
-      csv_name = "result/circle.csv"
-      self.trace = utils.Circle(xpos, other={"center": [0.0, 0.1], "freq": 0.5})
-      # csv_name = "result/line.csv"
-      # self.trace = utils.Line(xpos, other={"another_point": [0.15, 0.1], "period": 2})
+      # csv_name = "result/circle.csv"
+      # self.trace = utils.Circle(xpos, other={"center": [0.0, 0.1], "freq": 0.5})
+      csv_name = "result/line.csv"
+      self.trace = utils.Line(xpos, other={"another_point": [0.15, 0.1], "period": 2})
       is_running = viewer.is_running()
       self.epoch = 0
       data = []
