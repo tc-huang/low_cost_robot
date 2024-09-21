@@ -181,12 +181,13 @@ class Dynamixel:
 
     def _process_response(self, dxl_comm_result: int, dxl_error: int, motor_id: int):
         if dxl_comm_result != COMM_SUCCESS:
-            raise ConnectionError(
-                f"dxl_comm_result for motor {motor_id}: {self.packetHandler.getTxRxResult(dxl_comm_result)}")
+            raise ConnectionError(f"dxl_comm_result for motor {motor_id}: {self.packetHandler.getTxRxResult(dxl_comm_result)}")
+        elif dxl_error == 128:
+            # voltage error
+            pass
         elif dxl_error != 0:
             print(f'dxl error {dxl_error}')
-            raise ConnectionError(
-                f"dynamixel error for motor {motor_id}: {self.packetHandler.getTxRxResult(dxl_error)}")
+            raise ConnectionError(f"dynamixel error for motor {motor_id}: {self.packetHandler.getTxRxResult(dxl_error)}")
 
     def set_operating_mode(self, motor_id: int, operating_mode: OperatingMode):
         dxl_comm_result, dxl_error = self.packetHandler.write2ByteTxRx(self.portHandler, motor_id,
@@ -274,11 +275,10 @@ class Dynamixel:
                 # print("%s" % self.packetHandler.getTxRxResult(dxl_comm_result))
                 raise ConnectionError(f'dxl_comm_result {dxl_comm_result} for servo {motor_id} value {value}')
             else:
-                print(f'dynamixel read failure for servo {motor_id} trying again with {tries - 1} tries')
-                time.sleep(0.02)
+                print(f'dynamixel read failure for servo {motor_id} on board {self.config.device_name} trying again with {tries - 1} tries and {dxl_comm_result}')
                 return self._read_value(motor_id, attribute, num_bytes, tries=tries - 1)
-        elif dxl_error != 0:  # # print("%s" % self.packetHandler.getRxPacketError(dxl_error))
-            # raise ConnectionError(f'dxl_error {dxl_error} binary ' + "{0:b}".format(37))
+        if dxl_error != 0: #     # print("%s" % self.packetHandler.getRxPacketError(dxl_error))
+            raise ConnectionError(f'dxl_error {dxl_error} binary ' + "{0:b}".format(37))
             if tries == 0 and dxl_error != 128:
                 raise Exception(f'Failed to read value from motor {motor_id} error is {dxl_error}')
             else:
